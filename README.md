@@ -7,6 +7,6 @@ TASK 2: To run "launch_dataset_balancing.m" to generate "train_dataset.txt" and 
 
 TASK 3: To run "segmentation_values_v2.m" to train the system and generate "segmentation_values.txt".
 
-        To run "sign_classification_v2.m" to generate the output masks and save them in "candidate_mask\".
+To run "sign_classification_v2.m" to generate the output masks and save them in "candidate_mask\".
         
 TASK 4: To run "launch_system_evaluation.m" to generate "eval_results.txt".
