@@ -1,4 +1,4 @@
-# icv-m1-project
+# icv-m1-project: Team 7
 WEEK 1 run process:
 
 TASK 1: To run "launch_dataset_analysis.m" to generate "train_features.txt" and "px_coordinates.txt".
