@@ -23,11 +23,12 @@ function system_evaluation(directory)
             [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = ...
                 PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
 
-            evaluation = [evaluation; [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity]];
+            evaluation = [evaluation; [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity, pixelTP, pixelFP, pixelFN]];
         end
 
         tech_eval = mean(evaluation);
-        fprintf(eval_file, '%d\t%f\t%f\t%f\t%f\n', technique, tech_eval(1),tech_eval(2), tech_eval(3), tech_eval(4));
+        fprintf(eval_file, '%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n', technique, tech_eval(1),tech_eval(2), ...
+                tech_eval(3), tech_eval(4), tech_eval(5), tech_eval(6), tech_eval(7));
     end
     fclose(eval_file);
 
