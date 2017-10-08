@@ -1,5 +1,5 @@
 # icv-m1-project
-WEEK 1 executation process:
+WEEK 1 run process:
 
 TASK 1: To run "launch_dataset_analysis.m" to generate "train_features.txt" and "px_coordinates.txt".
 TASK 2: To run "launch_dataset_balancing.m" to generate "train_dataset.txt" and "val_dataset.txt".
