@@ -13,7 +13,7 @@ TASK 3:
 
 - To run "segmentation_values_v2.m" to train the system and generate "segmentation_values.txt".
 
-- To run "sign_classification_v2.m" to generate the output masks and save them in "candidate_mask" path.
+- To run "CandidateGenerationPixel_Color.m" to generate the output masks and save them in "candidate_mask" path.
         
 TASK 4: 
 
