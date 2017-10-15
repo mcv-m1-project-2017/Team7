@@ -35,11 +35,7 @@ function BackProjectionSegmentation(input, output, perceptual_info, alfa, noise_
                GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{2}, alfa)| ...
                GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{3}, alfa);
              imwrite(mask, strcat(output, '/mask.02.', file_id{1},'.png'));  
-        end
-        
-        
-        
-        
+        end 
     end
 end
 
