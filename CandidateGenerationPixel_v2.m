@@ -70,10 +70,11 @@ r_pixel_Cr_std=segmentation_values(32);
 
 
 %% Classification of images searching those pixels that are between mean(+\-)std.
+elapsed_time = [];
 for i=1:size(files,1),
 
     im = imread(strcat(directory,'/',files(i).name)); 
-
+    tic
 
     switch space
         case 'RGB'
@@ -129,20 +130,16 @@ for i=1:size(files,1),
 %   figure;
 %   imshow(im_seg*255)
   
-    %Hole filling:
-    im_seg = imfill(im_seg, 'holes');
+  im_seg = apply_morph_operator(im_seg, 1);
+%     ul_corner = regionprops(im_seg, 'BoundingBox');
 %   figure;
 %   imshow(im_seg*255)
-    
-    %Obtain min and max signal sizes:
-    sizes = txt2cell('/home/mcv07/Team7/dataset_analysis.txt', 'columns', [1 2]);
-    max_size = max(cell2mat(cellfun(@str2num,sizes(:, 2),'un',0)));
-    min_size = min(cell2mat(cellfun(@str2num,sizes(:,1),'un',0)));
-    
   
    % Saving the segmented mask.
     imwrite(im_seg,strcat('candidate_mask/mask.01.',files(i).name(1:9),'.png'));
     clear im im_seg
-
+    elapsed_time(i) = toc;
 end
 
+disp('Average time per frame: ')
+disp(mean(elapsed_time))
