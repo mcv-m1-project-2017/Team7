@@ -2,7 +2,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%% SYSTEM EVALUATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function system_evaluation(directory, eval_file)
+function system_evaluation(gt_path, masks_path, eval_file)
 
     addpath('evaluation/');
 
@@ -16,8 +16,8 @@ function system_evaluation(directory, eval_file)
 
         for i=1:size(val_dataset,1)
             file_id=val_dataset(i,1);
-            gt = imread(strcat(directory, '/mask/mask.', file_id{1}, '.png'));
-            mask = imread(strcat('candidate_mask/mask.0',num2str(technique),'.', file_id{1}, '.png'));
+            gt = imread(strcat(gt_path, '/mask/mask.', file_id{1}, '.png'));
+            mask = imread(strcat(masks_path,'/mask.0',num2str(technique),'.', file_id{1}, '.png'));
 
             [pixelTP, pixelFP, pixelFN, pixelTN] = PerformanceAccumulationPixel(mask, gt);
             [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = ...
