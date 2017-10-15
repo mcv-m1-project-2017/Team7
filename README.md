@@ -32,6 +32,10 @@ TASK 2:
 
 - Run  "compare_operators.m" to watch the computational efficiency.
 
+TASK 3:
+- Run "segmentation_values_v4.m" to train the system and generate "segmentation_values.txt"
+- Run "CandidateGenerationPixel_v2.m" to generate the output masks and save them in "candidate_mask" path.
+
 
 
 
