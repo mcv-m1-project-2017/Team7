@@ -1,6 +1,7 @@
-input_directory = '/home/mcv00/DataSet/4c/train';
-output_directory = 'BackProj_Masks';
+[perceptual_info] = BackProjectionTrain('/home/mcv00/DataSet/4c/train', 32);
 
-BackProjectionSegmentation(input_directory, output_directory);
+%Generate masks without noise reduction
+BackProjectionSegmentation('/home/mcv00/DataSet/4c/train', 'BackProjMasks', perceptual_info, 0.25, 0);
 
-
+%Generate masks with noise reduction
+BackProjectionSegmentation('/home/mcv00/DataSet/4c/train', 'BackProjMasks', perceptual_info, 0.25, 1);
