@@ -2,20 +2,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%% SYSTEM EVALUATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function system_evaluation(directory)
+function system_evaluation(directory, eval_file)
 
     addpath('evaluation/');
 
     %Evaluation results file
-    eval_file = fopen('eval_results.txt', 'w');
-    val_dataset = textscan(fopen('val_dataset.txt','rt'),'%s');
+    eval_file = fopen(eval_file, 'w');
+    val_dataset = txt2cell('train_dataset.txt', 'columns', 1);
 
     %Evaluation per technique
     for technique=1:3
         evaluation = [];
 
-        for i=1:size(val_dataset{1},1)
-            file_id=val_dataset{1}(i);
+        for i=1:size(val_dataset,1)
+            file_id=val_dataset(i,1);
             gt = imread(strcat(directory, '/mask/mask.', file_id{1}, '.png'));
             mask = imread(strcat('candidate_mask/mask.0',num2str(technique),'.', file_id{1}, '.png'));
 
