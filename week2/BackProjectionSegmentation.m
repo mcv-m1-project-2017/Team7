@@ -11,6 +11,7 @@ function BackProjectionSegmentation(input, output, perceptual_info, alfa, noise_
     %    'output'            Output path
     %    'perceptual_info'   Cell containing the perceptual information
     %    'alfa'              Probability threshold for mask generation
+    %    'noise_reduction'   Binary index to activate the noise reduction
     
     if 7~=exist(output,'dir'), mkdir(output); end
     val_dataset = txt2cell('val_dataset.txt', 'columns', 1);
