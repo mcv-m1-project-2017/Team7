@@ -26,7 +26,7 @@ WEEK 2 run process:
 
 TASK 1: 
 
-- Run  "compare_operators.m" to watch the result and difference of the operators and filters.
+- Change the directory of 'testImage' to the location of your image and run  "compare_operators.m" to watch the result and difference of the operators and filters.
 
 TASK 2: 
 
