@@ -1,1 +1,1 @@
-split_train_val_dataset('/home/mcv00/DataSet/4c/train')
+split_train_val_dataset('/home/mcv07/Team7/image_features.txt')

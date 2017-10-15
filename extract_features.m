@@ -92,18 +92,19 @@ function extract_features(directory, plot_features)
     
     %Compute and save statistics per signal type: max and min size, mean
     %form factor, mean filling ratio and frequency of appearance:
+    total_signals = sum(signal_counter);
     statsA = [min([typeA.signal_size]), max([typeA.signal_size]), mean([typeA.form_factor]), ...
-        mean([typeA.filling_ratio]), signal_counter(1)/sum(signal_counter)];
+        mean([typeA.filling_ratio]), signal_counter(1)/total_signals];
     statsB = [min([typeB.signal_size]), max([typeB.signal_size]), mean([typeB.form_factor]), ...
-        mean([typeB.filling_ratio]), signal_counter(2)/sum(signal_counter)];
+        mean([typeB.filling_ratio]), signal_counter(2)/total_signals];
     statsC = [min([typeC.signal_size]), max([typeC.signal_size]), mean([typeC.form_factor]), ...
-        mean([typeC.filling_ratio]), signal_counter(3)/sum(signal_counter)];
+        mean([typeC.filling_ratio]), signal_counter(3)/total_signals];
     statsD = [min([typeD.signal_size]), max([typeD.signal_size]), mean([typeD.form_factor]), ...
-        mean([typeD.filling_ratio]), signal_counter(4)/sum(signal_counter)];
+        mean([typeD.filling_ratio]), signal_counter(4)/total_signals];
     statsE = [min([typeE.signal_size]), max([typeE.signal_size]), mean([typeE.form_factor]), ...
-        mean([typeE.filling_ratio]), signal_counter(5)/sum(signal_counter)];
+        mean([typeE.filling_ratio]), signal_counter(5)/total_signals];
     statsF = [min([typeF.signal_size]), max([typeF.signal_size]), mean([typeF.form_factor]), ...
-        mean([typeF.filling_ratio]), signal_counter(6)/sum(signal_counter)];
+        mean([typeF.filling_ratio]), signal_counter(6)/total_signals];
     stats = [statsA; statsB; statsC; statsD; statsE; statsF]; %store them in a matrix
     
     dlmwrite('dataset_analysis.txt', stats, 'delimiter', '\t') %Write data into a textfile

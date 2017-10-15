@@ -3,25 +3,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function split_train_val_dataset(directory)
+function split_train_val_dataset(features_file)
 %Function that splits train dataset in train and validation subsets by saving
 %images id in a text file. Approximately the train dataset is the 70% of
 %the original dataset, while the validation is a 30%. Varargin "directory"
 %refers to the path where your dataset is allocated.
-    files = ListFiles(directory);
-    signals_found = [];
-    images_id = [];
+    sign_types = ['A', 'B', 'C', 'D', 'E', 'F'];
     % Save in an array the total number of traffic signals that appear and 
     % associate them to an image:
-    for i=1:size(files,1)
-        [signs, img_id] = extract_signal_type(directory, files, i);
-        signals_found = [signals_found, signs];
-        for j=1:length(signs)
-            images_id = [images_id, img_id];
-        end
-    end
-    images_id = mat2cell(images_id, 1, 9*ones(1,numel(signals_found)));
-    sign_types = ['A', 'B', 'C', 'D', 'E', 'F'];
+    data = txt2cell(features_file, 'columns', [1 13])';
+    images_id = data(1,:);    
+    signals_found = data(2, :);
+    clear data
+    
     signs_appearance = zeros(6,1);
     distributions_per_split = zeros(6,2);
     %Compute how many signals should be in each split
@@ -65,19 +59,19 @@ function split_train_val_dataset(directory)
     two_signals_val = 0;
     three_signals_val = 0;
     [images_2signals, images_3signals] = obtain_images_multiple_signals('/home/mcv07/Team7/train_features.txt');
-    train_2signals_idx = []
-    train_3signals_idx = []
-    val_2signals_idx = []
-    val_3signals_idx = []
+    train_2signals_idx = [];
+    train_3signals_idx = [];
+    val_2signals_idx = [];
+    val_3signals_idx = [];
     for k=1:length(train_dataset)
         contains_two = sum(strcmp(train_dataset(k),images_2signals));
         contains_three = sum(strcmp(train_dataset(k),images_3signals));
         two_signals_train = two_signals_train + contains_two;  
         three_signals_train =  three_signals_train + contains_three;
         if contains_two
-            train_2signals_idx = [train_2signals_idx, k]
+            train_2signals_idx = [train_2signals_idx, k];
         elseif contains_three
-            train_3signals_idx = [train_3signals_idx, k]
+            train_3signals_idx = [train_3signals_idx, k];
         end
     end
     for k=1:length(val_dataset)
@@ -111,34 +105,26 @@ function split_train_val_dataset(directory)
         train_dataset = [train_dataset, val_dataset(new_train_img_idx)];
         val_dataset(new_train_img_idx) = [];  
     end
-    %Save image_ids associated to train and val datasets in different text
-    %files:
-    train_file = fopen('train_dataset.txt', 'w');
-    fprintf(train_file, '%s\n', train_dataset{:});
-    fclose(train_file);
-    val_file = fopen('val_dataset.txt', 'w');
-    fprintf(val_file, '%s\n', val_dataset{:});
-    fclose(val_file);
-end
-
-function [signal_types, image_id] = extract_signal_type(directory, files, i)
-% Function that extracts the type of the signal (A, B, C, D, E or F) and
-% the id associated to the image.
-    image_id = files(i).name(1:size(files(i).name,2)-4);
-    name = strcat(directory, '/gt/gt.', image_id, '.txt');
-    file = fopen(name);
-    signal_types = [];
-    while(1)
-        row = fgetl(file);
-        if(row == -1)
-            break
-        else
-            gt = strsplit(row);
-            signal_types = [signal_types, gt(5)];
+    clear train_indexs val_indexs images_2signals images_3signals
+    
+    %Add features extracted in train and val dataset files
+    features = txt2cell('./image_features.txt');
+    t_txt=fopen('train_dataset.txt','w');
+    v_txt=fopen('val_dataset.txt','w');
+    t=1; v=1;
+    for i=1:size(features,1)
+        if sum(strcmp(train_dataset, features{i,1}))
+            new_train_dataset(t,:) = features(i,:);
+            t=t+1;
+            fprintf(t_txt,'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n',features{i,:});
+        elseif sum(strcmp(val_dataset,features{i,1}))
+            new_val_dataset(v,:) = features(i,:);
+            v=v+1;
+            fprintf(v_txt,'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n',features{i,:});
         end
-        
     end
-    fclose(file)
+    fclose(t_txt);
+    fclose(v_txt);
 end
 
 function [images2, images_3] = obtain_images_multiple_signals(features)
@@ -173,4 +159,28 @@ function [dup_names] = get_duplicates(cell_array)
     [unique_cell,~,unique_cell_ndx] = unique(cell_array);
     N = histc(unique_cell_ndx,1:numel(unique_cell));
     dup_names = unique_cell(N>1);
+end
+%TODO: Finish check by size!!!
+function [new_train, new_val] = check_by_size(train_dataset, val_dataset, features)
+    features_analysis = {[]};
+    signal_types = ['A', 'B', 'C', 'D','E', 'F'];
+    counter_big = zeros(1,6);
+    counter_small = zeros(1,6);
+    for i=1:6
+        idx = find(strcmp(signal_types(i), features(:,13)));
+        mean_area = mean(features(idx, 6));
+        std_area = std(features(idx, 6));
+        for k=1:length(idx);
+            features_analysis.image_id = features(idx(k), 1);
+            features_analysis.signal_type = signal_types(i);
+            if features(idx(k), 6) < mean_area - std_area
+               features_analysis.size = 'big';
+               counter_big(i) = counter_big(i) + 1;
+            elseif features(idx(k), 6) > mean_area + std_area
+               features_analysis.size = 'small';
+               counter_small(i) = counter_small(i) + 1;
+            end
+        end
+        
+    end
 end
