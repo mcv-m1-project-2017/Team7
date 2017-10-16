@@ -21,21 +21,18 @@ function BackProjectionSegmentation(input, output, perceptual_info, alfa, noise_
         file_id=val_dataset(i,1);
         img = rgb2hsv(imread(strcat(input,'/',file_id{1},'.jpg')));
         
-        if noise_reduction
-            M1 = apply_morph_operator(GenerateMask(img(:,:,1), img(:,:,2), ...
-                perceptual_info{1}, alfa), 1);
-            M2 = apply_morph_operator(GenerateMask(img(:,:,1), img(:,:,2), ...
-                perceptual_info{1}, alfa), 1);
-            M3 = apply_morph_operator(GenerateMask(img(:,:,1), img(:,:,2), ...
-                perceptual_info{1}, alfa), 1);
-            mask = M1 | M2 | M3;
-            imwrite(mask, strcat(output, '/mask.01.', file_id{1},'.png'));
-        else
-             mask = GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{1}, alfa)| ...
+        mask = GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{1}, alfa)| ...
                GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{2}, alfa)| ...
                GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{3}, alfa);
+        
+        if noise_reduction
+            mask = apply_morph_operator(mask, 1);
+            imwrite(mask, strcat(output, '/mask.01.', file_id{1},'.png'));
+        else
+
              imwrite(mask, strcat(output, '/mask.02.', file_id{1},'.png'));  
-        end 
+        end
+
     end
 end
 
