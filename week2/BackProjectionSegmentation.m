@@ -32,7 +32,6 @@ function BackProjectionSegmentation(input, output, perceptual_info, alfa, noise_
 
              imwrite(mask, strcat(output, '/mask.02.', file_id{1},'.png'));  
         end
-
     end
 end
 
