@@ -1,11 +1,10 @@
 masks_path = "";
+
+%Train the system
+[perceptual_info] = BackProjectionTrain('/home/mcv00/DataSet/4c/train', 32);
+
 %Generate masks without noise_reduction
-[perceptual_info] = BackProjectionTrain('train', 32);
 BackProjectionSegmentation('/home/mcv00/DataSet/4c/train', masks_path, perceptual_info, 0.25, 0);
 
 %Generate masks with noise_reduction
-[perceptual_info] = BackProjectionTrain('train', 32);
 BackProjectionSegmentation('/home/mcv00/DataSet/4c/train', masks_path, perceptual_info, 0.25, 1);
-
-%Evaluate system
-system_evaluation('/home/mcv00/DataSet/4c/train', masks_path, 'BackProj_eval.txt')
