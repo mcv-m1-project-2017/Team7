@@ -29,8 +29,7 @@ function [im_seg] = SlidingConnectedComponentLabeling(im_seg, show)
     end
     
     if show, show_candidates(im_seg, candidate_X, candidate_Y); end
-    
-    
+
 end
 
 function [X, Y] = find_candidates(img, size_i, size_j, fr, th)
