@@ -22,7 +22,6 @@ function [im_seg] = SlidingConnectedComponentLabeling(im_seg, show)
     %slide each window
     candidate_X = []; candidate_Y = [];
     for w = 1:N_windows
-        %[X, Y] = find_candidates(im_seg, size_i(w), size_j(w), fr, 0);
         [X, Y] = find_candidates(im_seg, size_i(w), size_j(w), fr, 0);
         candidate_X = [candidate_X; X];
         candidate_Y = [candidate_Y; Y];
