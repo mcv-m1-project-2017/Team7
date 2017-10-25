@@ -26,7 +26,7 @@ function [bboxes] = merge_bboxes(candidate_X, candidate_Y, show, im_seg)
     numRegionsInGroup = histcounts(componentIndices);
     bboxes(numRegionsInGroup == 1, :) = [];
 
-    % Show the final text detection result.
+    % Show the final detection result.
     imshow(im_seg*255)
     hold on
     if show
