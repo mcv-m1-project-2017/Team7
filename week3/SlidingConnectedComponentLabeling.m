@@ -1,11 +1,11 @@
-function [im_seg] = SlidingConnectedComponentLabeling(im_seg, show)
+function [bboxes] = SlidingConnectedComponentLabeling(im_seg, show)
 
     %Compute ratios
-    train_dataset = txt2cell('train_dataset.txt', 'columns', [3, 4, 8]);
+    train_dataset = txt2cell('train_dataset.txt', 'columns', [3, 4, 7, 8]);
     w = cell2vec(train_dataset(:,1)); w = [min(w), max(w)];
     h = cell2vec(train_dataset(:,2)); h = [min(h), max(h)];
-
-    fr = cell2vec(train_dataset(:,3)); 
+    
+    fr = cell2vec(train_dataset(:,4)); 
     mean_fr = mean(fr); var_fr = std(fr);
     fr = [mean_fr-var_fr, mean_fr+var_fr];
     
@@ -17,7 +17,7 @@ function [im_seg] = SlidingConnectedComponentLabeling(im_seg, show)
     for i = 1:N_windows
         size_i(i) = h(1)+((i-1)*pi);
         size_j(i) = w(1)+((i-1)*pj);  
-    end  
+    end
     
     %slide each window
     candidate_X = []; candidate_Y = [];
@@ -27,8 +27,8 @@ function [im_seg] = SlidingConnectedComponentLabeling(im_seg, show)
         candidate_Y = [candidate_Y; Y];
     end
     
-    if show, show_candidates(im_seg, candidate_X, candidate_Y); end
-
+    %if show, show_candidates(im_seg, candidate_X, candidate_Y); end
+    bboxes = merge_bboxes(candidate_X, candidate_Y, show, im_seg);
 end
 
 function [X, Y] = find_candidates(img, size_i, size_j, fr, th)
@@ -48,20 +48,4 @@ function [X, Y] = find_candidates(img, size_i, size_j, fr, th)
             end
         end 
     end
-end
-
-function [vector] = cell2vec(cell)
-    vector = [];
-    for i=1:size(cell,1)
-        aux = cell(i);
-        vector = [vector, str2double(aux{1})];
-    end
-end
-
-function show_candidates(img, X, Y)
-    imshow(img)
-    hold on
-    for i=1:size(X,1)
-        rectangle('Position',[Y(i,1), X(i,1) ,Y(i,2)-Y(i,1), X(i,3)-X(i,1)], 'EdgeColor','g');
-    end 
 end
