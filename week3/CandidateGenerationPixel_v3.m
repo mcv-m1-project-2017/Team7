@@ -17,7 +17,7 @@ space='HCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H' or 'HCbCr', ind
 morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
 std=1.3; %standard deviation increase
 write_results = 0; % Int value: 1 if want to save generated masks, 0 otherwise
-show=1; % Int value: 1 if want to show the results, 0 otherwise
+show=0; % Int value: 1 if want to show the results, 0 otherwise
 
 if Method==1
     CCL=1; % Int value: 1 if want to aply the ConnectedComponentLabeling method, 0 otherwise
@@ -160,12 +160,16 @@ for i=1:size(files,1)
     
 %   figure;
 %   imshow(im)
-%   figure;
-%   imshow(im_seg*255)
+if show
+   figure;
+   imshow(im_seg*255)
+end
   if strcmp(morph_operator,'Yes')
     im_seg = apply_morph_operator(im_seg, 1);
-%   figure;
-%   imshow(im_seg*255)
+    if show 
+        figure;
+        imshow(im_seg*255)
+    end
   end
   
   if CCL
@@ -173,7 +177,7 @@ for i=1:size(files,1)
     stats=regionprops(CC,'BoundingBox');
     BoundingBoxes=zeros(size(stats,1),4);
         for j=1:size(stats,1)
-            BoundingBoxes(j,:)=stats(j).BoundingBox;
+            BoundingBoxes(j,:)=round(stats(j).BoundingBox);
         end   
   elseif SCCL
       %im_seg = SlidingConnectedComponentLabeling(im_seg, 1);
@@ -182,11 +186,17 @@ for i=1:size(files,1)
       BoundingBoxes=SlidingConnectedComponentLabeling_int(im_seg);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
   end
   
-  [im_seg,WinCand]=windowCand(im_seg, w, h, ff, fr, BoundingBoxes, method,directory);
+  [im_seg,windowCandidates] = windowCand(im_seg, w, h, ff, fr, BoundingBoxes);
+  if show
+   figure;
+   imshow(im_seg)
+  end
       
    % Saving the segmented mask.
    if write_results
-    imwrite(im_seg,strcat('/home/mcv07/m1-results/week2/test/method2/mask.',files(i).name(1:9),'.png'));
+    imwrite(im_seg,strcat('C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\github\Team7-master\week3\candidate_mask\method',num2str(Method),'\',files(i).name(1:9),'.png'));
+    direc_save=strcat('C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\github\Team7-master\week3\candidate_mask\method',num2str(Method),'\',files(i).name(1:9),'.mat');
+    save(direc_save,'windowCandidates');
     clear im im_seg
    end
    elapsed_time(i) = toc;
