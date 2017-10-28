@@ -1,23 +1,37 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CandidateGeneration
+% CandidateGeneration - Week3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%    
+clear
+clc 
 
 directory='C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\training_data_set\train';
 files = ListFiles(directory);
-
+Method=1; %Int value: 1 if want to aply the task 1 method
 space='HCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H' or 'HCbCr', indicating which color channels are used in the segmentation
 morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
-CCL=1; % Int value: 1 if want to aply the ConnectedComponentLabeling method, 0 otherwise
-SCCL=0; % Int value: 1 if want to aply the SlidingConnectedComponentLabeling method, 0 otherwise
 std=1.3; %standard deviation increase
 write_results = 0; % Int value: 1 if want to save generated masks, 0 otherwise
 show=1; % Int value: 1 if want to show the results, 0 otherwise
+
+if Method==1
+    CCL=1; % Int value: 1 if want to aply the ConnectedComponentLabeling method, 0 otherwise
+    SCCL=0; % Int value: 1 if want to aply the SlidingConnectedComponentLabeling method, 0 otherwise
+    SCCL_int=0;  % Int value: 1 if want to aply the SlidingConnectedComponentLabeling with integral Images method, 0 otherwise
+elseif Method==2;
+    CCL=0; % Int value: 1 if want to aply the ConnectedComponentLabeling method, 0 otherwise
+    SCCL=1; % Int value: 1 if want to aply the SlidingConnectedComponentLabeling method, 0 otherwise
+    SCCL_int=0;  % Int value: 1 if want to aply the SlidingConnectedComponentLabeling with integral Images method, 0 otherwise
+elseif Method==3;
+    CCL=0; % Int value: 1 if want to aply the ConnectedComponentLabeling method, 0 otherwise
+    SCCL=0; % Int value: 1 if want to aply the SlidingConnectedComponentLabeling method, 0 otherwise
+    SCCL_int=1;  % Int value: 1 if want to aply the SlidingConnectedComponentLabeling with integral Images method, 0 otherwise 
+end
  
 %% Reading the segmentation values
 datfile=['segmentation_values.txt'];
@@ -158,16 +172,17 @@ for i=1:size(files,1)
     CC=bwconncomp(im_seg);
     stats=regionprops(CC,'BoundingBox');
     BoundingBoxes=zeros(size(stats,1),4);
-    for j=1:size(stats,1)
-        BoundingBoxes(j,:)=stats(j).BoundingBox;
-    end
-    
+        for j=1:size(stats,1)
+            BoundingBoxes(j,:)=stats(j).BoundingBox;
+        end   
   elseif SCCL
       %im_seg = SlidingConnectedComponentLabeling(im_seg, 1);
-      BoundingBoxes=SlidingConnectedComponentLabeling(im_seg)    %Proposo fer-ho aix�, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
+      BoundingBoxes=SlidingConnectedComponentLabeling(im_seg);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
+  elseif SCCL_int
+      BoundingBoxes=SlidingConnectedComponentLabeling_int(im_seg);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
   end
   
-  [im_seg,WinCand]=windowCandidates(im_seg, w, h, ff, fr, BoundingBoxes);
+  [im_seg,WinCand]=windowCand(im_seg, w, h, ff, fr, BoundingBoxes, method,directory);
       
    % Saving the segmented mask.
    if write_results
