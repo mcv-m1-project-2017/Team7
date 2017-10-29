@@ -9,10 +9,10 @@
 %%    
 clear
 clc 
-
-directory='C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\training_data_set\train';
+mkdir('results');
+directory='D:\Documentos\MCV\M1. Introduction to human and computer vision\Project\train';
 files = ListFiles(directory);
-Method=1; %Int value: 1 if want to aply the task 1 method
+Method=3; %Int value: 1 if want to aply the task 1 method
 space='HCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H' or 'HCbCr', indicating which color channels are used in the segmentation
 morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
 std=1.3; %standard deviation increase
@@ -181,9 +181,9 @@ end
         end   
   elseif SCCL
       %im_seg = SlidingConnectedComponentLabeling(im_seg, 1);
-      BoundingBoxes=SlidingConnectedComponentLabeling(im_seg);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
+      BoundingBoxes=SlidingConnectedComponentLabeling(im_seg,show);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
   elseif SCCL_int
-      BoundingBoxes=SlidingConnectedComponentLabeling_int(im_seg);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
+      BoundingBoxes=SlidingConnectedComponentLabeling_int(im_seg,show);    %Proposo fer-ho així, on BoundingBoxes es una matriu on les columnes son [tly, tlx, w, h)
   end
   
   [im_seg,windowCandidates] = windowCand(im_seg, w, h, ff, fr, BoundingBoxes);
@@ -194,8 +194,9 @@ end
       
    % Saving the segmented mask.
    if write_results
-    imwrite(im_seg,strcat('C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\github\Team7-master\week3\candidate_mask\method',num2str(Method),'\',files(i).name(1:9),'.png'));
-    direc_save=strcat('C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\github\Team7-master\week3\candidate_mask\method',num2str(Method),'\',files(i).name(1:9),'.mat');
+
+    imwrite(im_seg,strcat('results','\',files(i).name(1:9),'.png'));
+    direc_save=strcat('results','\',files(i).name(1:9),'.mat');
     save(direc_save,'windowCandidates');
     clear im im_seg
    end
