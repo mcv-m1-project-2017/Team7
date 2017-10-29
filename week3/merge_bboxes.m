@@ -1,6 +1,9 @@
 function [bboxes] = merge_bboxes(candidate_X, candidate_Y, show, im_seg)
 % Function that merges overlapped clusters into one only cluster
-
+    if size(candidate_X) == [0 0]
+        bboxes = [];
+        return
+    end
     % Compute the overlap ratio
     overlapRatio = bboxOverlapRatio([candidate_Y(:,1) candidate_X(:,1) candidate_Y(:,4)-candidate_Y(:,1), candidate_X(:,4)-candidate_X(:,1)],...
         [candidate_Y(:,1) candidate_X(:,1) candidate_Y(:,4)-candidate_Y(:,1), candidate_X(:,4)-candidate_X(:,1)]);
@@ -21,18 +24,19 @@ function [bboxes] = merge_bboxes(candidate_X, candidate_Y, show, im_seg)
     xmax = accumarray(componentIndices', candidate_X(:,4), [], @max);
     ymax = accumarray(componentIndices', candidate_Y(:,4), [], @max);
 
-    % Compose the merged bounding boxes using the [x y width height] format.
-    bboxes = [xmin ymin xmax-xmin+1 ymax-ymin+1];
+    % Compose the merged bounding boxes using the [y x width height] format.
+    bboxes = [ymin xmin ymax-ymin+1 xmax-xmin+1];
     numRegionsInGroup = histcounts(componentIndices);
     bboxes(numRegionsInGroup == 1, :) = [];
-
+    if show
     % Show the final detection result.
     imshow(im_seg*255)
     hold on
     if show
         for k = 1 : length(xmax)
-          rectangle('Position', [bboxes(k,2), bboxes(k,1),bboxes(k,4),bboxes(k,3)],...
+          rectangle('Position', [bboxes(k,1), bboxes(k,2),bboxes(k,3),bboxes(k,4)],...
           'EdgeColor','g','LineWidth',2 )
         end
+    end
     end
 end
