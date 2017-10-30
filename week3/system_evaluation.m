@@ -27,10 +27,10 @@ function system_evaluation(gt_path, detect_path, eval_file, performance_file)
             bbox_gt = txt2cell(strcat(gt_path, '/gt/gt.', file_id{1},'.txt'), 'columns', 1:4);
         
             for k=1:size(bbox_gt,1)
-               annotation.y = floor(str2num(cell2mat(bbox_gt(k,1))));
-               annotation.x = floor(str2num(cell2mat(bbox_gt(k,2))));
-               annotation.w = floor(str2num(cell2mat(bbox_gt(k,4)))) - floor(str2num(cell2mat(bbox_gt(k,2))))+1;
-               annotation.h = floor(str2num(cell2mat(bbox_gt(k,3)))) - floor(str2num(cell2mat(bbox_gt(k,1))))+1; 
+               annotation(k).y = floor(str2num(cell2mat(bbox_gt(k,1))));
+               annotation(k).x = floor(str2num(cell2mat(bbox_gt(k,2))));
+               annotation(k).w = floor(str2num(cell2mat(bbox_gt(k,4)))) - floor(str2num(cell2mat(bbox_gt(k,2))))+1;
+               annotation(k).h = floor(str2num(cell2mat(bbox_gt(k,3)))) - floor(str2num(cell2mat(bbox_gt(k,1))))+1; 
             end
             [TP,FN,FP] = PerformanceAccumulationWindow(detections.windowCandidates, annotation);
             [precision, sensitivity, accuracy] = PerformanceEvaluationWindow(TP, FN, FP);
