@@ -82,8 +82,7 @@ function templates = extract_templates(template_type, debug, show)
         a = uint8(mean_a); b = uint8(mean_b);
         c = uint8(mean_c); d = uint8(mean_d);
         e = uint8(mean_e); f = uint8(mean_f);
-        
-        
+             
         if strcmp(template_type, 'grayscale') 
             a = rgb2gray(a); b = rgb2gray(b);
             c = rgb2gray(c); d = rgb2gray(d);
@@ -96,5 +95,11 @@ function templates = extract_templates(template_type, debug, show)
         end
         templates = {a, b, c, d, e, f};
     end 
+    imwrite(a, 'template_A.png', 'mode', 'lossless');
+    imwrite(b, 'template_B.png', 'mode', 'lossless');
+    imwrite(c, 'template_C.png', 'mode', 'lossless');
+    imwrite(d, 'template_D.png', 'mode', 'lossless');
+    imwrite(e, 'template_E.png', 'mode', 'lossless');
+    imwrite(f, 'template_F.png', 'mode', 'lossless');
 end
 
