@@ -71,25 +71,30 @@ function templates = extract_templates(template_type, debug, show)
     mean_c = c / signal_count(3);  mean_d = d / signal_count(4);
     mean_e = e / signal_count(5);  mean_f = f / signal_count(6);
     
-    if strcmp(template_type, 'bwtemplate')
+    if strcmp(template_type, 'bw')
         if show
             figure; imshow(mean_a); figure; imshow(mean_b);
             figure; imshow(mean_c); figure; imshow(mean_d);
             figure; imshow(mean_e); figure; imshow(mean_f);
         end
-        templates = [mean_a, mean_b, mean_c, mean_d, mean_e, mean_f];
-    elseif strcmp(template_type, 'color')
+        templates = {mean_a, mean_b, mean_c, mean_d, mean_e, mean_f};
+    else
         a = uint8(mean_a); b = uint8(mean_b);
         c = uint8(mean_c); d = uint8(mean_d);
         e = uint8(mean_e); f = uint8(mean_f);
+        
+        
+        if strcmp(template_type, 'grayscale') 
+            a = rgb2gray(a); b = rgb2gray(b);
+            c = rgb2gray(c); d = rgb2gray(d);
+            e = rgb2gray(e); f = rgb2gray(f);           
+        end
         if show
             figure; imshow(a); figure; imshow(b);
             figure; imshow(c); figure; imshow(d);
             figure; imshow(e); figure; imshow(f);
         end
-        templates = [a, b, c, d, e, f];
-    else
-        disp('Error: No valid template type. Please, select bwtemplate or color.');
-        return
+        templates = {a, b, c, d, e, f};
+    end 
 end
 
