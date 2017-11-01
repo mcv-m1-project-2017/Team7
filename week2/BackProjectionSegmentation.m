@@ -1,4 +1,4 @@
-function BackProjectionSegmentation(input, output, perceptual_info, alfa)
+function BackProjectionSegmentation(input, output, perceptual_info, alfa, noise_reduction)
     % BackProjectionSegmentation
     % Function to segment the input signals using percetual information.
     % All the masks are saved at output path.
@@ -11,22 +11,27 @@ function BackProjectionSegmentation(input, output, perceptual_info, alfa)
     %    'output'            Output path
     %    'perceptual_info'   Cell containing the perceptual information
     %    'alfa'              Probability threshold for mask generation
+    %    'noise_reduction'   Binary index to activate the noise reduction
     
     if 7~=exist(output,'dir'), mkdir(output); end
-    val_dataset = textscan(fopen('val_dataset.txt','rt'),'%s');
+    val_dataset = txt2cell('val_dataset.txt', 'columns', 1);
     
-    for i=1:size(val_dataset{1},1)
+    for i=1:size(val_dataset,1)
         
-        file_id=val_dataset{1}(i);
+        file_id=val_dataset(i,1);
         img = rgb2hsv(imread(strcat(input,'/',file_id{1},'.jpg')));
         
         mask = GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{1}, alfa)| ...
                GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{2}, alfa)| ...
                GenerateMask(img(:,:,1), img(:,:,2), perceptual_info{3}, alfa);
         
-        imwrite(mask, strcat(output, '/', file_id{1},'.jpg'));
-        
-        
+        if noise_reduction
+            mask = apply_morph_operator(mask, 1);
+            imwrite(mask, strcat(output, '/mask.01.', file_id{1},'.png'));
+        else
+
+             imwrite(mask, strcat(output, '/mask.02.', file_id{1},'.png'));  
+        end
     end
 end
 

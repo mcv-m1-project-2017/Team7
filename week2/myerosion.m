@@ -11,13 +11,13 @@ SEcenter = [round(SEy/2);round(SEx/2)];
 
 %Padding - Mirroring
 %X Axis
-for i=1:1:(SEcenter(2))
+for i=1:1:(SEcenter(2)-1)
     padImg(i,:) = in_img(1,:);
     padImg2(i,:) = in_img(size(in_img,1),:);
 end
 padImg = [padImg;in_img;padImg2];
 %Y Axis
-for i=1:1:(SEcenter(1))
+for i=1:1:(SEcenter(1)-1)
     padImgy(:,i) = padImg(:,1);
     padImgy2(:,i) = padImg(:,size(padImg,2));
 end
