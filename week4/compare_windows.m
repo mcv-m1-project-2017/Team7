@@ -10,9 +10,6 @@ function corr_list = compare_windows(im, im_seg, windowCandidates, templates)
     num_win = length(windowCandidates);
     corr_list = zeros(num_win, 6);
    for i=1:num_win
-       if i ==2
-           i;
-       end
        xmax = windowCandidates(i).x + windowCandidates(i).w - 1;
        ymax = windowCandidates(i).y + windowCandidates(i).h - 1;
        im_bounded = im(windowCandidates(i).y:ymax, windowCandidates(i).x:xmax);
