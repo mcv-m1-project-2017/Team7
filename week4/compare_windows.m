@@ -1,7 +1,7 @@
-function corr_list = compare_windows(im, im_seg, windowCandidates, templates)
+function [cands] = compare_windows(im, im_seg, windowCandidates, thresh, templates)
     %Function that compared window candidates with different templates and
     %returns the correlation between them.
-    if nargin < 4
+    if nargin < 5
         temp_A = imread('template_A.png'); temp_B = imread('template_B.png');
         temp_C = imread('template_C.png'); temp_D = imread('template_D.png');
         temp_E = imread('template_E.png'); temp_F = imread('template_F.png');
@@ -9,6 +9,7 @@ function corr_list = compare_windows(im, im_seg, windowCandidates, templates)
     end
     num_win = length(windowCandidates);
     corr_list = zeros(num_win, 6);
+    cands = [];
    for i=1:num_win
        xmax = windowCandidates(i).x + windowCandidates(i).w - 1;
        ymax = windowCandidates(i).y + windowCandidates(i).h - 1;
@@ -20,6 +21,9 @@ function corr_list = compare_windows(im, im_seg, windowCandidates, templates)
             template = imresize(templates{k}, [size(candidate,1) size(candidate,2)]);
             corr_list(i,k) = corr2(candidate, template); 
           end
+       end
+       if max(corr_list(i,:)) > thresh
+           cands = [cands; windowCandidates(i)];
        end
    end
 end
