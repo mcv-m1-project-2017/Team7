@@ -23,10 +23,26 @@ function candidate_bboxes = corr_template_matching(im, mask, thresh, show, templ
                 if show_corr, figure; surf(c); shading flat; end
                 [ypeak, xpeak] = find(c==max(c(:)));
                 yoffSet = ypeak-size(template,1);
-                if yoffSet < 0, yoffSet = 0; end
+                if yoffSet < 0 
+                    break 
+                end
                 xoffSet = xpeak-size(template,2);
-                if xoffSet < 0, xoffSet = 0; end
-                bbox = [xoffSet+1, yoffSet+1, size(template,2), size(template,1)];
+                if xoffSet < 0
+                    break
+                end
+                if xoffSet +1 + size(template,1)>size(im_gray,1)
+                    %h = size(im_gray,1)-xoffSet-2;
+                    break
+                else
+                    h = size(template,1);
+                end
+                if yoffSet+1+size(template,2) > size(im_gray,2)
+                    %w = size(im_gray,2)-yoffSet-2;
+                    break
+                else
+                    w = size(template,2);
+                end
+                bbox = [xoffSet+1, yoffSet+1, w, h];
                 candidate_bboxes = [candidate_bboxes; bbox];
             end
         end

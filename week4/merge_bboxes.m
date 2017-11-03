@@ -1,6 +1,6 @@
 function [bboxes] = merge_bboxes(candidate_X, candidate_Y, yxwh, show, im_seg)
 % Function that merges overlapped clusters into one only cluster
-    if size(candidate_X) == [0 0]
+    if size(candidate_X) == [0 0] |  size(yxwh) == [0 0]
         bboxes = [];
         return
     end
