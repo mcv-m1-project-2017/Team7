@@ -25,7 +25,7 @@ evaluation = zeros(size(files,1),4);
 wTP=zeros(size(files,1));
 wFN=zeros(size(files,1));
 wFP=zeros(size(files,1));
-for method=11:11
+
 %% Method descriptions:
 if method==1
     space='HandCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
@@ -184,5 +184,5 @@ end
    
     end
     
-end
+
 
