@@ -1,4 +1,4 @@
-function [cands, scores_list] = chanfer_compare_windows(im, windowCandidates, thresh, templates)
+function [cands] = chanfer_compare_windows(im, windowCandidates, thresh, templates)
     %Function that compared window candidates with different templates and
     %returns the correlation between them.
 
@@ -13,7 +13,6 @@ function [cands, scores_list] = chanfer_compare_windows(im, windowCandidates, th
        for k=1:length(templates)
           if ~isempty(im_bounded)
             template = resize_template(templates{k}, size(im_bounded,1), size(im_bounded,2));
-            figure; imshow(template);
             scores = slightly_score(im_proc, template);
             scores_list(i,k) = min(scores(:));
           end
@@ -30,7 +29,6 @@ function score = slightly_score(input_img, template)
         size(input_img,2)+size(template,2));
     img(1:size(img,1)-size(template,1), 1:size(img,2)-size(template,2)) = input_img;
     score =  zeros(size(img));
-    imshow(img)
     for i=1:size(img,1)-size(template,1)
         for j=1:size(img,2)-size(template,2)
             img_aux = img(i:i+size(template,1)-1, j:j+size(template,2)-1);
