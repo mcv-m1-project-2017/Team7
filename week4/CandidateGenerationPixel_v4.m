@@ -10,14 +10,14 @@
 clear
 clc 
 addpath('evaluation');
-directory='C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\github\Team7-master\week4\validation_images'; %directori of the images that we whant to mask
-directory_train='C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\training_data_set\train'; %directori of the mask's (for the evaluation
-directory_results='C:\Users\Jordi\Jordi\Uni\master CV\M1-Intro to Human Vision\project\github\Team7-master\week4\results'; %directori where the results are saved
+directory='/home/mcv00/DataSet/test'; %directori of the images that we whant to mask
+directory_train='/home/mcv00/DataSet/train'; %directori of the mask's (for the evaluation
+directory_results='/home/mcv07/m1-results/week4/test'; %directori where the results are saved
 
 method=2; %Int value: 1 if want to aply method 1
 show=0; % Int value: 1 if want to show the results, 0 otherwise
 write_results = 1; % Int value: 1 if want to save generated masks, 0 otherwise
-eval_results=1; % Int value: 1 if want evaluate the results, 0 if not
+eval_results=0; % Int value: 1 if want evaluate the results, 0 if not
 
 
 files = ListFiles(directory);
@@ -25,13 +25,14 @@ evaluation = zeros(size(files,1),4);
 wTP=zeros(size(files,1));
 wFN=zeros(size(files,1));
 wFP=zeros(size(files,1));
-
+for method=1:2
 %% Method descriptions:
-if method==1
+if method==1 %week 3 modified
     space='HandCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
     morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
     CCL=1; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
     TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
+    CW = 0; % Int value: 1 if you want to apply the compare window method, 0 otherwise
     method_morph=2; 
     windMethod=2;
     
@@ -39,12 +40,13 @@ if method==1
     cw_thresh = 0.6; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
     crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
 end
-if method==2
+
+if method==2 %compare window
     space='HandCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
     morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
     CCL=1; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
     TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
-    CW = 1; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
+    CW = 1; % Int value: 1 if you want to apply the compare window method, 0 otherwise
     method_morph=2; 
     windMethod=2;
     
@@ -52,8 +54,6 @@ if method==2
     cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
     crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
 end
-
-
 
 %% Reading the segmentation values
 datfile=['segmentation_values.txt'];
@@ -106,17 +106,18 @@ for i=1:size(files,1)
         [im_seg,windowCandidates] = windowCand_v2(im_seg, w, h, ff, fr, BoundingBoxes,windMethod);
     end
 
-%Template Matching:     
+ %Template_matching:     
     if TM
           BoundingBoxes = corr_template_matching(im, im_seg, crosscorr_thresh, show);  %BoundingBoxes = [tly, tlx, w, h)
           [im_seg,windowCandidates] = windowCand_v2(im_seg, w, h, ff, fr, BoundingBoxes,windMethod);
-          windowCandidates = compare_windows(im, im_seg, windowCandidates, cw_thresh); %Verify candidates using correlation template matching
+    end   
+    
+    
+%Compare window:     
+    if CW
+          [im_seg,windowCandidates] = compare_windows(im, im_seg, windowCandidates, cw_thresh); %Verify candidates using correlation template matching
     end
  
-     if CW
-          [im_seg,windowCandidates] = compare_windows(im, im_seg, windowCandidates, cw_thresh); %Verify candidates using correlation template matching
-     end
-    
   if show
    figure;
    imshow(im_seg)
@@ -124,9 +125,9 @@ for i=1:size(files,1)
   
 % Saving the segmented mask.
    if write_results
-    imwrite(im_seg,strcat(directory_results, '\method', num2str(method),'\',files(i).name(1:9),'.png'));
+    imwrite(im_seg,strcat(directory_results, '/method', num2str(method),'/',files(i).name(1:9),'.png'));
         if CCL
-            direc_save=strcat(directory_results, '\method', num2str(method),'\',files(i).name(1:9),'.mat');
+            direc_save=strcat(directory_results, '/method', num2str(method),'/',files(i).name(1:9),'.mat');
             save(direc_save,'windowCandidates');
         end
    end
@@ -135,14 +136,14 @@ for i=1:size(files,1)
    %% Evaluation
     if eval_results
         %Pixel evaluation
-       gt = imread(strcat(directory_train, '\mask\mask.', files(i).name(1:9), '.png'));
+       gt = imread(strcat(directory_train, '/mask/mask.', files(i).name(1:9), '.png'));
        [pixelTP, pixelFP, pixelFN, pixelTN] = PerformanceAccumulationPixel(im_seg, gt);
        [pixelPrecision, pixelRecall, pixelF1] = PerformanceEvaluationPixel_v2(pixelTP, pixelFP, pixelFN, pixelTN);
        evaluation(i,:) =[pixelPrecision, pixelRecall, pixelF1, elapsed_time];
        
        %Window evaluation
-       if CCL||TM
-            bbox_gt = txt2cell(strcat(directory_train, '\gt\gt.', files(i).name(1:9),'.txt'), 'columns', 1:4);
+       if CCL||CW||TM
+            bbox_gt = txt2cell(strcat(directory_train, '/gt/gt.', files(i).name(1:9),'.txt'), 'columns', 1:4);
             annotations = [];            
             for k=1:size(bbox_gt,1)
                annotation.y = floor(str2num(cell2mat(bbox_gt(k,1))));
@@ -184,5 +185,4 @@ end
    
     end
     
-
-
+end
