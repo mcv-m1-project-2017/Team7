@@ -63,15 +63,20 @@ function candidate_bboxes = chanfer_template_matching(im, mask, thresh, show, te
         end
     end
 end
-
-function score = slightly_score(img, template)
-    score = zeros(size(img));
+function score = slightly_score(input_img, template)
+    %score = zeros([size(img,1)-size(template,1),size(img,2)-size(template,2)]);
+    img = max(max(input_img))*ones(size(input_img,1)+size(template,1), ...
+        size(input_img,2)+size(template,2));
+    img(1:size(img,1)-size(template,1), 1:size(img,2)-size(template,2)) = input_img;
+    score =  zeros(size(img));
+    imshow(img)
     for i=1:size(img,1)-size(template,1)
         for j=1:size(img,2)-size(template,2)
-            img_aux = img(i:size(template,1), i:size(template,2));
+            img_aux = img(i:i+size(template,1)-1, j:j+size(template,2)-1);
             score(i,j) = sum(sum(img_aux .* template));
         end
     end
+    score = score(1:size(img,1)-size(template,1),1:size(img,2)-size(template,2)); 
 end
 
 function template = resize_template(template, x, y)
