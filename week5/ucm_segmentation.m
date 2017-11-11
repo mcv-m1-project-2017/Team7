@@ -2,7 +2,7 @@ function im_seg = ucm_segmentation(image, threshold_ucm, segmentation_values, st
     addpath('segment-ucm');
     segments = segment_ucm(image, threshold_ucm);
     labels = unique(segments);
-    im_HSV = rgb2hsv(im);
+    im_HSV = rgb2hsv(image);
     h = im_HSV(:,:,1); s = im_HSV(:,:,2);
     clear im_HSV
     im_seg = zeros(size(image,1), size(image,2));
