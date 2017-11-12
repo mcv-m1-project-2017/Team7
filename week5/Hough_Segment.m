@@ -257,8 +257,8 @@ if plotting
 end
     cands = [];
     for i=1:size(windowCandidates,1)
-        cand.y = windowCandidates(i,1);
-        cand.x = windowCandidates(i,2);
+        cand.y = windowCandidates(i,2);
+        cand.x = windowCandidates(i,1);
         cand.w = windowCandidates(i,3);
         cand.h = windowCandidates(i,4);
         cands = [cands; cand];
