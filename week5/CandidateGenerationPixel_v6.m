@@ -49,10 +49,11 @@ if method==2
     CCL=0; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
     TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
     CW = 0; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
+    HG = 0; % Int value: 1 if you want to apply the hough transform method, 0 otherwise
     stdr=1.8; %standard deviation increase
     method_morph=4; 
     windMethod=2;
-    segmentation = 'mean-shift'; % 'color' or 'mean-shift'
+    segmentation = 'color'; % 'color' or 'mean-shift'
     
     %stdr=1.3; %standard deviation increase
     cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
@@ -75,6 +76,22 @@ if method==3
     crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
 end
 
+if method==4
+    space='HS2';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
+    morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
+    CCL=0; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
+    TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
+    CW = 0; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
+    HG = 1; % Int value: 1 if you want to apply the hough transform method, 0 otherwise
+    stdr=1.8; %standard deviation increase
+    method_morph=4; 
+    windMethod=2;
+    segmentation = 'color'; % 'color' or 'mean-shift'
+    
+    %stdr=1.3; %standard deviation increase
+    cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
+    crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
+end
 %% Reading the segmentation values
 datfile=['segmentation_values.txt'];
 fid=fopen(datfile,'rt');
@@ -94,13 +111,14 @@ elapsed_time = [];
 
 for i=1:size(files,1)
 
-    im = imread(strcat(directory,'/',files(i).name)); 
+    im = imread(strcat(directory,'\',files(i).name)); 
     tic
+
 %Color Segmentation:
     if strcmp(segmentation, 'color')
         im_seg=color_segmentation_v2(im,space,segmentation_values,stdr);
     elseif strcmp(segmentation, 'mean-shift')
-        im_seg = mean_shift_segmentation(im, 1/2, space, segmentation_values, stdr, show);
+        im_seg = mean_shift_segmentation(im, 1/4, space, segmentation_values, stdr, show);
     else
         error('Not a valid segmentation method');
         break
@@ -139,6 +157,10 @@ for i=1:size(files,1)
           [im_seg,windowCandidates] = windowCand_v2(im_seg, w, h, ff, fr, BoundingBoxes,windMethod);
           windowCandidates = compare_windows(im, im_seg, windowCandidates, cw_thresh); %Verify candidates using correlation template matching
     end
+    %Hough transform
+    if HG
+            [windowCandidates] = Hough_Segment(im,im_seg);
+    end
  
      if CW
           [im_seg,windowCandidates] = compare_windows(im, im_seg, windowCandidates, cw_thresh); %Verify candidates using correlation template matching
@@ -152,7 +174,7 @@ for i=1:size(files,1)
 % Saving the segmented mask.
    if write_results
     imwrite(im_seg,strcat(directory_results, '\method', num2str(method),'\',files(i).name(1:9),'.png'));
-        if CCL
+        if CCL | HG
             direc_save=strcat(directory_results, '\method', num2str(method),'\',files(i).name(1:9),'.mat');
             save(direc_save,'windowCandidates');
         end
@@ -168,7 +190,7 @@ for i=1:size(files,1)
        evaluation(i,:) =[pixelPrecision, pixelRecall, pixelF1, elapsed_time];
 
        %Window evaluation
-       if CCL||TM
+       if CCL||TM || HG
             bbox_gt = txt2cell(strcat(directory_train, '\gt\gt.', files(i).name(1:9),'.txt'), 'columns', 1:4);
             annotations = [];            
             for k=1:size(bbox_gt,1)
