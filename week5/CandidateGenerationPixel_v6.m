@@ -26,77 +26,51 @@ evaluation2=zeros(20,5);
 wTP=zeros(size(files,1));
 wFN=zeros(size(files,1));
 wFP=zeros(size(files,1));
-
-%% Method descriptions:
 if method==1
-    space='HandCbCr';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
+    space='HS2';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
     morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
-    CCL=0; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
+    CCL=1; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
+    CCL_team3=0;
     TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
     CW = 0; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
-    method_morph=2; 
+    CTM = 1; % Int value: 1 if you want to apply the chanfer_template_matching, 0 otherwise
+    method_morph=4; 
     windMethod=2;
-    segmentation = 'mean-shift'; % 'color' or 'mean-shift'
+    segmentation = 'color'; % 'color' or 'mean-shift'
     
     stdr=1.3; %standard deviation increase
-    cw_thresh = 0.6; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
+    cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
     crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
+    chanfer_th = 14200; % Int value: Threshold to apply to the chanfer_template_matching method
 end
 
 if method==2
     space='HS2';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
     morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
-    CCL=0; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
+    CCL=1; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
     TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
     CW = 0; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
-    HG = 0; % Int value: 1 if you want to apply the hough transform method, 0 otherwise
-    stdr=1.8; %standard deviation increase
+    CTM = 1; % Int value: 1 if you want to apply the chanfer_template_matching, 0 otherwise
     method_morph=4; 
-    windMethod=2;
-    segmentation = 'color'; % 'color' or 'mean-shift'
-    
-    %stdr=1.3; %standard deviation increase
-    cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
-    crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
-end
-
-if method==3
-    space='HS';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
-    morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
-    CCL=0; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
-    TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
-    CW = 0; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
-    stdr=1.8; %standard deviation increase
-    method_morph=3; 
     windMethod=2;
     segmentation = 'mean-shift'; % 'color' or 'mean-shift'
     
-    %stdr=1.3; %standard deviation increase
+    stdr=1.8; %standard deviation increase
     cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
     crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
+    chanfer_th = 13750; % Int value: Threshold to apply to the chanfer_template_matching method
 end
 
-if method==4
-    space='HS2';  %'seg_type' string that can be 'RGB' 'CbCr', 'H', 'HorCbCr' or 'HandCbCr', indicating which color channels are used in the segmentation
-    morph_operator='Yes'; %'morph_operator' string that can be 'Yes','No', indicating if morphological operators are used
-    CCL=0; % Int value: 1 if want to apply the ConnectedComponentLabeling method, 0 otherwise
-    TM = 0; % Int value: 1 if you want to apply the corr_template_matching method, 0 otherwise
-    CW = 0; % Int value: 1 if you want to apply the compare_window method, 0 otherwise
-    HG = 1; % Int value: 1 if you want to apply the hough transform method, 0 otherwise
-    stdr=1.8; %standard deviation increase
-    method_morph=4; 
-    windMethod=2;
-    segmentation = 'color'; % 'color' or 'mean-shift'
-    
-    %stdr=1.3; %standard deviation increase
-    cw_thresh = 0.25; % Double value: Threshold to apply to the correlation template matching in order to compare candidate windows. Between 0 and 1.
-    crosscorr_thresh = 0.7; % Double value: Threshold to apply to the cross-correlation template matching method
-end
 %% Reading the segmentation values
 datfile=['segmentation_values.txt'];
 fid=fopen(datfile,'rt');
 segmentation_values=fscanf(fid,'%f');
 fclose all;
+
+%% Extract chanfer template matching templates
+if CTM
+    chanfer_templates = chanfer_extract_templates(show);
+end
 
 %Compute ratios for window candidates
 train_dataset = txt2cell('train_dataset.txt', 'columns', [3, 4, 7, 8]);
@@ -157,6 +131,8 @@ for i=1:size(files,1)
           [im_seg,windowCandidates] = windowCand_v2(im_seg, w, h, ff, fr, BoundingBoxes,windMethod);
           windowCandidates = compare_windows(im, im_seg, windowCandidates, cw_thresh); %Verify candidates using correlation template matching
     end
+
+    
     %Hough transform
     if HG
             [windowCandidates] = Hough_Segment(im,im_seg);
