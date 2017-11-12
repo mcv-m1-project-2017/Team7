@@ -1,4 +1,4 @@
-function [output_mask] = chamfer_template_matching(input_mask, templates, threshold)
+function [output_mask] = chamfer_template_matching(input_mask, templatess, threshold)
     
     norm_coef = [0.8, 0.8, 1.4, 1, 1, 1];
     CC = regionprops(logical(input_mask),'BoundingBox');
