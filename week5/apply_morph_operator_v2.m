@@ -34,7 +34,7 @@ switch(method)
             
             im_seg = imfill(im_seg,'holes');     
             SE_S = ones(9,9);
-            SE_C = strel('disk',9);
+            SE_C = strel('diamond',9);
             SE_T1 = [ 0   0   0   0   0   1   0   0   0   0   0
                       0   0   0   0   0   1   0   0   0   0   0
                       0   0   0   0   1   1   1   0   0   0   0
@@ -57,8 +57,20 @@ switch(method)
             im_seg= imdilate(im_seg, SE);
             im_seg = imfill(im_seg, 'holes');
             im_seg=imerode(im_seg,SE);
-            SE_1=strel('disk',6);
+            SE_1 = [0   0   1   1   1   1   1   1   1   0   0
+                    0   1   1   1   1   1   1   1   1   1   0
+                    1   1   1   1   1   1   1   1   1   1   1
+                    1   1   1   1   1   1   1   1   1   1   1
+                    1   1   1   1   1   1   1   1   1   1   1
+                    1   1   1   1   1   1   1   1   1   1   1
+                    1   1   1   1   1   1   1   1   1   1   1
+                    1   1   1   1   1   1   1   1   1   1   1
+                    1   1   1   1   1   1   1   1   1   1   1
+                    0   1   1   1   1   1   1   1   1   1   0
+                    0   0   1   1   1   1   1   1   1   0   0];
+                 
             im_seg=imopen(im_seg,SE_1);
+            
     otherwise
         disp('Error, not a valid method')
 end
